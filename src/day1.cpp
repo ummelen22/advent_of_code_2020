@@ -6,15 +6,13 @@
 
 using namespace std;
 
-vector<int> readPuzzleInputFromFile(string &fileName)
-{
+vector<int> readPuzzleInputFromFile(string &fileName) {
     ifstream inFile;
     string line;
     vector<int> numbersInFile;
 
     inFile.open(fileName);
-    while (getline(inFile, line))
-    {
+    while (getline(inFile, line)) {
         numbersInFile.push_back(stoi(line));
     }
     inFile.close();
@@ -22,28 +20,23 @@ vector<int> readPuzzleInputFromFile(string &fileName)
     return numbersInFile;
 }
 
-int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberOfKeys)
-{
-    for (auto const &it : inputMap)
-    {
+int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberOfKeys) {
+    for (auto const &it : inputMap) {
         int diff = sum - it.first;
         if (numberOfKeys > 2) {
             // Create temporary map to prevent the same key to be found in the recursive function call
             map<int, int> tmpInputMap = inputMap;
             tmpInputMap.erase(it.first);
             int tmpNumberOfKeys = numberOfKeys - 1;
-            if (int product = getProductOfKeysThatSumUpToX(tmpInputMap, diff, tmpNumberOfKeys))
-            {
+            if (int product = getProductOfKeysThatSumUpToX(tmpInputMap, diff, tmpNumberOfKeys)) {
                 return it.first * product;
             }
-            else
-            {
+            else {
                 continue;
             }
         }
         auto search = inputMap.find(diff);
-        if (search != inputMap.end() and search->second != it.second)
-        {
+        if (search != inputMap.end() and search->second != it.second) {
             return it.first * search->first;
         }
     }
@@ -51,16 +44,14 @@ int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberO
     return 0;
 }
 
-int main()
-{
+int main() {
     // Read puzzle input from txt file
     string fileName = "../inputs/day1.txt";
     vector<int> inputArray = readPuzzleInputFromFile(fileName);
 
     // Create std::map, mapping the puzzle input integers to their indices (O(log n) time complexity for search)
     map<int, int> inputMap;
-    for (int i = 0; i < inputArray.size(); i++)
-    {
+    for (int i = 0; i < inputArray.size(); i++) {
         inputMap[inputArray[i]] = i;
     }
 
