@@ -27,8 +27,7 @@ int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberO
     for (auto const &it : inputMap)
     {
         int diff = sum - it.first;
-        if (numberOfKeys > 2)
-        {
+        if (numberOfKeys > 2) {
             // Create temporary map to prevent the same key to be found in the recursive function call
             map<int, int> tmpInputMap = inputMap;
             tmpInputMap.erase(it.first);
@@ -56,13 +55,13 @@ int main()
 {
     // Read puzzle input from txt file
     string fileName = "../inputs/day1.txt";
-    vector<int> input_array = readPuzzleInputFromFile(fileName);
+    vector<int> inputArray = readPuzzleInputFromFile(fileName);
 
     // Create std::map, mapping the puzzle input integers to their indices (O(log n) time complexity for search)
     map<int, int> inputMap;
-    for (int i = 0; i < input_array.size(); i++)
+    for (int i = 0; i < inputArray.size(); i++)
     {
-        inputMap[input_array[i]] = i;
+        inputMap[inputArray[i]] = i;
     }
 
     // Get user input
@@ -75,5 +74,5 @@ int main()
 
     // Find product of keys recursively
     int product = getProductOfKeysThatSumUpToX(inputMap, sum, numberOfKeys);
-    cout << product << endl;
+    cout << "Solution: " << product << endl;
 }
