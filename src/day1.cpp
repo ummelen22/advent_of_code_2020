@@ -6,7 +6,7 @@
 
 using namespace std;
 
-vector<int> readPuzzleInputFromFile(string &fileName) {
+vector<int> readPuzzleInputFromFile(string& fileName) {
     ifstream inFile;
     string line;
     vector<int> numbersInFile;
@@ -20,7 +20,7 @@ vector<int> readPuzzleInputFromFile(string &fileName) {
     return numbersInFile;
 }
 
-int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberOfKeys) {
+int getProductOfKeysThatSumUpToX(map<int, int>& inputMap, int& sum, int& numberOfKeys) {
     for (auto const &it : inputMap) {
         int diff = sum - it.first;
         if (numberOfKeys > 2) {
