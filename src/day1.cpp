@@ -20,11 +20,6 @@ std::vector<int> readPuzzleInputFromFile(const std::string &fileName) {
             std::cerr << "Invalid argument: " << line << " is out of range of representable values of int." << std::endl;
         }
     }
-
-    for (auto &it : numbersInFile) {
-        std::cout << it << std::endl;
-    }
-
     return numbersInFile;
 }
 
