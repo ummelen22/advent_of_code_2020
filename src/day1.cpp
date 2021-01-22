@@ -2,8 +2,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <map>
 #include <unordered_set>
+#include <map>
+#include <time.h>
 
 std::vector<int> readPuzzleInputFromFile(const std::string &fileName) {
     std::ifstream inFile(fileName);
@@ -72,8 +73,11 @@ int main() {
     std::cin >> sum;
     std::cout << "Amount of numbers that should add up to " << sum << " (>=2):";
     std::cin >> numberOfKeys;
-
+    clock_t t;
+    t = clock();
     // Find product of keys recursively
     int product = getProductOfKeysThatSumUpToX(inputMap, sum, numberOfKeys);
+    t = clock() - t;
     std::cout << "Solution: " << product << std::endl;
+    std::cout << "It took " << ((float)t)/CLOCKS_PER_SEC << " seconds\n";
 }
