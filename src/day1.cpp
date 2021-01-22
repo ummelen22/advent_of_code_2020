@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_set>
 
 std::vector<int> readPuzzleInputFromFile(const std::string &fileName) {
     std::ifstream inFile(fileName);
@@ -23,15 +24,20 @@ std::vector<int> readPuzzleInputFromFile(const std::string &fileName) {
     return numbersInFile;
 }
 
-int getProductOfKeysThatSumUpToX(std::map<int, int> &inputMap, int &sum, int &numberOfKeys) {
+int getProductOfKeysThatSumUpToX(std::map<int, int> &inputMap, const int sum, int numberOfKeys, std::unordered_set<int> visitedKeys = {}) {
+    // Guard clause checking whether input for numberOfKeys is valid
+    if (numberOfKeys < 2) {
+        std::cout << "Only number of keys of 2 or higher are allowed, you entered " << numberOfKeys << std::endl;
+        exit(EXIT_FAILURE); 
+    }
+
+    // Recursive call to find keys that sum up to sum
     for (auto const &it : inputMap) {
         int diff = sum - it.first;
         if (numberOfKeys > 2) {
-            // Create temporary map to prevent the same key to be found in the recursive function call
-            std::map<int, int> tmpInputMap = inputMap;
-            tmpInputMap.erase(it.first);
+            visitedKeys.insert(it.first);
             int tmpNumberOfKeys = numberOfKeys - 1;
-            if (int product = getProductOfKeysThatSumUpToX(tmpInputMap, diff, tmpNumberOfKeys)) {
+            if (int product = getProductOfKeysThatSumUpToX(inputMap, diff, tmpNumberOfKeys, visitedKeys)) {
                 return it.first * product;
             }
             else {
@@ -39,7 +45,8 @@ int getProductOfKeysThatSumUpToX(std::map<int, int> &inputMap, int &sum, int &nu
             }
         }
         auto search = inputMap.find(diff);
-        if (search != inputMap.end() and search->second != it.second) {
+        bool unusedKey = visitedKeys.find(diff) == visitedKeys.end();
+        if (search != inputMap.end() and unusedKey and search->second != it.second) {
             return it.first * search->first;
         }
     }
@@ -63,7 +70,7 @@ int main() {
     int numberOfKeys;
     std::cout << "Sum you are looking for: ";
     std::cin >> sum;
-    std::cout << "Amount of numbers that should add up to " << sum << ": ";
+    std::cout << "Amount of numbers that should add up to " << sum << " (>=2):";
     std::cin >> numberOfKeys;
 
     // Find product of keys recursively
