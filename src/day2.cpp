@@ -40,18 +40,21 @@ map<string, map<char, Bounds>> splitStrings(vector<string>& linesInFile) {
         }
         subStrings.push_back(line);
 
+        // Define bounds, character and password from substrings vector
         string boundsString = subStrings.front();
         char letter = subStrings[1][0];
         string password = subStrings.back();
-        while (result.find(password) != result.end()) {
-            password += "_";
-        }
+
         string boundsDelimiter = "-";
         auto pos = boundsString.find(boundsDelimiter);
         int lb = stoi(boundsString.substr(0, pos));
         int ub = stoi(boundsString.substr(pos+boundsDelimiter.length(), string::npos));
-
         Bounds bounds = {lb, ub};
+
+        while (result.find(password) != result.end()) {
+            // Add underscore to password if it is not unique
+            password += "_";
+        }
 
         map<char, Bounds> tmp;
         tmp.insert(pair<char, Bounds>(letter, bounds));
