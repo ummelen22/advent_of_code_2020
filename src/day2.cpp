@@ -5,20 +5,30 @@
 #include <map>
 #include <math.h>
 
-using namespace std;
 
-vector<string> readPuzzleInputFromFile(string &fileName) {
-    ifstream inFile;
-    string line;
-    vector<string> linesInFile;
+std::vector<std::string> readPuzzleInputFromFile(std::string fileName) {
+    std::ifstream inFile(fileName);
+    std::string line;
+    std::vector<std::string> linesInFile;
 
-    inFile.open(fileName);
     while (getline(inFile, line)) {
         linesInFile.push_back(line);
     }
-    inFile.close();
-
     return linesInFile;
+}
+
+std::vector<std::string> splitString(std::string line, std::string delimiter){
+    size_t pos = line.find(delimiter);
+    size_t initPos = 0;
+    std::vector<std::string> subStrings = {};
+    while (pos != std::string::npos) {
+        subStrings.push_back(line.substr(initPos, pos - initPos));
+        initPos = pos + 1;
+        pos = line.find(delimiter, initPos);
+    }
+    subStrings.push_back(line.substr(initPos, std::min(pos, line.size()) - initPos + 1));
+
+    return subStrings;
 }
 
 struct Bounds {
@@ -26,44 +36,36 @@ struct Bounds {
     int bounds[2];
 };
 
-map<string, map<char, Bounds>> splitStrings(vector<string>& linesInFile) {
-    size_t pos = 0;
-    string subString;
-    string delimiter = " ";
-    map<string, map<char, Bounds>> result;
+std::multimap<std::string, std::map<char, Bounds>> createMapFromInput(std::vector<std::string> linesInFile) {
+    std::multimap<std::string, std::map<char, Bounds>> inputMap;
     for (auto &line : linesInFile) {
-        vector<string> subStrings;
-        while ((pos = line.find(delimiter)) != string::npos) {
-            subString = line.substr(0, pos);
-            subStrings.push_back(subString);
-            line.erase(0, pos + delimiter.length());
-        }
-        subStrings.push_back(line);
+        std::vector<std::string> subStrings = splitString(line, " ");
 
         // Define bounds, character and password from substrings vector
-        string boundsString = subStrings.front();
+        std::string boundsString = subStrings.front();
         char letter = subStrings[1][0];
-        string password = subStrings.back();
+        std::string password = subStrings.back();
 
-        string boundsDelimiter = "-";
-        auto pos = boundsString.find(boundsDelimiter);
-        int lb = stoi(boundsString.substr(0, pos));
-        int ub = stoi(boundsString.substr(pos+boundsDelimiter.length(), string::npos));
-        Bounds bounds = {lb, ub};
+        // Extract bounds as integers from boundsString
+        try {
+            auto pos = boundsString.find('-');
+            int lb = std::stoi(boundsString.substr(0, pos));
+            int ub = std::stoi(boundsString.substr(pos + 1, std::string::npos));
+            Bounds bounds = {lb, ub};
 
-        while (result.find(password) != result.end()) {
-            // Add underscore to password if it is not unique
-            password += "_";
+            std::map<char, Bounds> letterBounds = { {letter, bounds} };
+            inputMap.insert(std::pair<std::string, std::map<char, Bounds>>(password, letterBounds));
+        }   
+        catch (const std::invalid_argument &ia) {
+            std::cout << "Could not convert one or more bounds in [" << boundsString << "] to integer\n";
+            std::cout << "Skipping line " << inputMap.size() + 1 << " of the input file.\n";
+            continue; 
         }
-
-        map<char, Bounds> tmp;
-        tmp.insert(pair<char, Bounds>(letter, bounds));
-        result.insert(pair<string, map<char, Bounds>>(password, tmp));
     }
-    return result;
+    return inputMap;
 }
 
-int howOftenCharInString(char& c, string& s) {
+int howOftenCharInString(char c, std::string s) {
     int n = 0;
     for (int i = 0; i < s.size(); i++) {
         if (s[i] == c) {
@@ -73,10 +75,10 @@ int howOftenCharInString(char& c, string& s) {
     return n;
 }
 
-bool isPasswordValid(string password, char letter, int bounds[2]) {
+bool isPasswordValid(std::string password, char letter, int bounds[2]) {
     int numberOfOccurrences = howOftenCharInString(letter, password);
-    int lb = min(bounds[0], bounds[1]);
-    int ub = max(bounds[0], bounds[1]);
+    int lb = std::min(bounds[0], bounds[1]);
+    int ub = std::max(bounds[0], bounds[1]);
     if (numberOfOccurrences >= lb && numberOfOccurrences <= ub) {
         return true;
     } else {
@@ -86,9 +88,9 @@ bool isPasswordValid(string password, char letter, int bounds[2]) {
 
 int main() {
     // Read puzzle input from txt file
-    string fileName = "../inputs/day2.txt";
-    vector<string> inputLines = readPuzzleInputFromFile(fileName);
-    map<string, map<char, Bounds>> passwordMap = splitStrings(inputLines);
+    std::string fileName = "../inputs/day2.txt";
+    std::vector<std::string> inputLines = readPuzzleInputFromFile(fileName);
+    std::multimap<std::string, std::map<char, Bounds>> passwordMap = createMapFromInput(inputLines);
 
     int numberOfValidPasswords = 0;
     for (auto &itr : passwordMap){
@@ -98,5 +100,5 @@ int main() {
                 }
         }
     }
-    cout << "Solution: " << numberOfValidPasswords << endl;
+    std::cout << "Solution part 1: " << numberOfValidPasswords << std::endl;
 }
