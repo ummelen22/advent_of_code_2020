@@ -75,15 +75,22 @@ int howOftenCharInString(char c, std::string s) {
     return n;
 }
 
-bool isPasswordValid(std::string password, char letter, int bounds[2]) {
-    int numberOfOccurrences = howOftenCharInString(letter, password);
-    int lb = std::min(bounds[0], bounds[1]);
-    int ub = std::max(bounds[0], bounds[1]);
-    if (numberOfOccurrences >= lb && numberOfOccurrences <= ub) {
-        return true;
-    } else {
-        return false;
-    }
+bool isPasswordValid(std::string password, char letter, int bounds[2], int part) {
+    int lb = std::min(bounds[0], bounds[1]); // lower bound
+    int ub = std::max(bounds[0], bounds[1]); // upper bound
+    if (part == 1) { // Validation method of part 1 of the problem
+        int numberOfOccurrences = howOftenCharInString(letter, password);
+        if (numberOfOccurrences >= lb && numberOfOccurrences <= ub) {
+            return true;
+        }
+    } else if (part == 2) { // Validation method of part 2 of the problem
+        bool firstComparison = password[lb - 1] == letter;
+        bool secondComparison = password[ub - 1] == letter;
+        if ((firstComparison && !secondComparison) || (!firstComparison && secondComparison)){
+            return true;
+        }
+    } 
+    return false;
 }
 
 int main() {
@@ -92,13 +99,15 @@ int main() {
     std::vector<std::string> inputLines = readPuzzleInputFromFile(fileName);
     std::multimap<std::string, std::map<char, Bounds>> passwordMap = createMapFromInput(inputLines);
 
-    int numberOfValidPasswords = 0;
-    for (auto &itr : passwordMap){
-        for (auto &ptr : itr.second) {
-            if (isPasswordValid(itr.first, ptr.first, ptr.second.bounds)) {
-                    numberOfValidPasswords++;
-                }
+    int numberOfValidPasswords[2] = {0, 0};
+    for (int part = 1; part <= 2; part++)
+        for (auto &itr : passwordMap){
+            for (auto &ptr : itr.second) {
+                if (isPasswordValid(itr.first, ptr.first, ptr.second.bounds, part)) {
+                        numberOfValidPasswords[part-1]++;
+                    }
+            }
         }
-    }
-    std::cout << "Solution part 1: " << numberOfValidPasswords << std::endl;
+    std::cout << "Solution part 1: " << numberOfValidPasswords[0] << std::endl;
+    std::cout << "Solution part 2: " << numberOfValidPasswords[1] << std::endl;
 }
