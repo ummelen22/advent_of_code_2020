@@ -42,6 +42,19 @@ std::vector<std::unordered_map<std::string, std::string>> readPuzzleInputFromFil
     return passports;
 }
 
+bool isKeyValueValid(std::string key, std::string value){
+    if (key == "byr") {
+        try {
+            int byr = std::stoi(value);
+            if (byr >= 1920 && byr <= 2002) return true;
+        }
+        catch (std::invalid_argument) {
+            std::cout << "Value " << value << " for key " << key << " could not be converted to int.\n";
+        }
+        return false;
+    }
+}
+
 int main() {
     std::vector<std::unordered_map<std::string, std::string>> passports = readPuzzleInputFromFile("../inputs/day4.txt");
     std::vector<std::string> keys = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"};
@@ -52,6 +65,7 @@ int main() {
                 counter--;
                 break;
             } 
+            else if (key == "byr" ) counter -= (int)!isKeyValueValid(key, passport.at(key));
         }
     }
 
