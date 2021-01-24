@@ -21,8 +21,7 @@ int numberOfTreesOnSlope(const std::vector<std::string>& area, std::vector<int> 
     int stepRight = slope[0];
     int stepDown = slope[1];
     for (std::vector<std::string>::const_iterator it = area.begin(); it != area.end() + stepDown - 1; it += stepDown) {
-            std::string line = *it;
-            if (line[index % line.length()] == '#') {
+            if ((*it)[index % (*it).length()] == '#') {
                 counter++;
             }
             index += stepRight;
@@ -30,7 +29,7 @@ int numberOfTreesOnSlope(const std::vector<std::string>& area, std::vector<int> 
     return counter;
 }
 
-int calcProduct(const std::vector<std::string>& inputLines, const std::vector<std::vector<int>>& stepCombinations) {
+int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std::vector<std::vector<int>>& stepCombinations) {
     
     std::vector<int> numberOfTreesPerSlope = {};
 
@@ -59,6 +58,6 @@ int main() {
         {1, 2}
     };
     
-    std::cout << "Solution part 1: " << calcProduct(inputLines, slopesPart1) << std::endl;
-    std::cout << "Solution part 2: " << calcProduct(inputLines, slopesPart2) << std::endl;
+    std::cout << "Solution part 1: " << productOfTreesOnSlopes(inputLines, slopesPart1) << std::endl;
+    std::cout << "Solution part 2: " << productOfTreesOnSlopes(inputLines, slopesPart2) << std::endl;
 }
