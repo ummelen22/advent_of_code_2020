@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <unordered_set>
-
 
 std::vector<std::string> readPuzzleInputFromFile(std::string fileName) {
     std::ifstream inFile(fileName);
