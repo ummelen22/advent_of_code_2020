@@ -5,7 +5,7 @@
 std::vector<std::string> readPuzzleInputFromFile(std::string fileName) {
     std::ifstream inFile(fileName);
     std::string line;
-    std::vector<std::string> linesInFile;
+    std::vector<std::string> linesInFile{};
 
     while (getline(inFile, line)) {
         linesInFile.push_back(line);
@@ -27,11 +27,11 @@ int numberOfTreesOnSlope(const std::vector<std::string>& area, std::vector<int> 
     return counter;
 }
 
-int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std::vector<std::vector<int>>& stepCombinations) {
+int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std::vector<std::vector<int>>& slopes) {
     
-    std::vector<int> numberOfTreesPerSlope = {};
+    std::vector<int> numberOfTreesPerSlope{};
 
-    for (std::vector<std::vector<int>>::const_iterator it = stepCombinations.begin(); it != stepCombinations.end(); it++) {
+    for (std::vector<std::vector<int>>::const_iterator it = slopes.begin(); it != slopes.end(); it++) {
         int numberOfTrees = numberOfTreesOnSlope(inputLines, *it);
         numberOfTreesPerSlope.push_back(numberOfTrees);
     } 
@@ -45,10 +45,10 @@ int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std
 }
 
 int main() {
-    std::vector<std::string> inputLines = readPuzzleInputFromFile("../inputs/day3.txt");
+    const std::vector<std::string> inputLines = readPuzzleInputFromFile("../inputs/day3.txt");
 
-    std::vector< std::vector<int> > slopesPart1 = {{3, 1}}; // slopes for part 1 {step right, step down}
-    std::vector< std::vector<int> > slopesPart2 = { // slopes for part 2 {step right, step down}
+    const std::vector< std::vector<int> > slopesPart1 = {{3, 1}}; // slopes for part 1 {step right, step down}
+    const std::vector< std::vector<int> > slopesPart2 = { // slopes for part 2 {step right, step down}
         {1, 1},
         {3, 1},
         {5, 1},
