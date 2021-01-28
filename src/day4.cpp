@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <regex>
+#include <algorithm>
 
 std::vector<std::string> splitString(std::string line, std::string delimiter){
     size_t pos = line.find(delimiter);
@@ -43,14 +44,6 @@ std::vector<std::unordered_map<std::string, std::string>> readPuzzleInputFromFil
     return passports;
 }
 
-bool endsWith(std::string fullString, std::string ending) {
-    if (fullString.length() >= ending.length()) {
-        return (fullString.compare(fullString.length() - ending.length(), ending.length(), ending) == 0);
-    } else {
-        return false;
-    }
-}
-
 bool isKeyValueValid(std::string key, std::string value){
     if (key.find("yr") != std::string::npos) {
         try { // Validate years
@@ -62,26 +55,33 @@ bool isKeyValueValid(std::string key, std::string value){
         catch (std::invalid_argument) {
             std::cout << "Value " << value << " for key " << key << " could not be converted to int.\n";
         }
-    } else if (key == "hgt" ) {
-        // std::cout << value << std::endl;
+    } else if (key == "hgt") {
         std::string heightString = value;
+        heightString.erase(heightString.length() - 2, 2);
+        const std::regex endsWithCm("^[0-9]{3}cm$");
+        const std::regex endsWithIn("^[0-9]{2}in$");
+        // std::cout << heightString << " " << value << std::endl;
         try {
-            if (endsWith(value, "cm")) {
-                heightString.erase(heightString.length() - 2, 2);
+            if (std::regex_match(value, endsWithCm)) {
                 int height = std::stoi(heightString);
                 if (height >= 150 && height <= 193) return true;
-            } else if (endsWith(value, "in")){
-                heightString.erase(heightString.length() - 2, 2);
+            } else if (std::regex_match(value, endsWithIn)){
                 int height = std::stoi(heightString);
                 if (height >= 59 && height <= 76) return true;
-            } else return false;
+            }
         } catch (std::invalid_argument) {
             std::cout << "Value " << value << " for key " << key << " could not be converted to int.\n";
         }
     } else if (key == "hcl") {
         const std::regex hairColorConstraints("^#([a-f0-9]{6})$"); 
-        std::cout << value << " " << std::regex_match(value, hairColorConstraints) << std::endl;
-    }
+        if (std::regex_match(value, hairColorConstraints)) return true;
+    } else if (key == "ecl") {
+        std::vector<std::string> eyeColors = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+        if (std::find(eyeColors.begin(), eyeColors.end(), value) != eyeColors.end()) return true;
+    } else if (key == "pid") {
+        const std::regex passportIDConstraints("^[0-9]{9}$");
+        if (std::regex_match(value, passportIDConstraints)) return true;
+    } else if (key == "cid") return true;
     return false;
 }
 
@@ -95,7 +95,12 @@ int main() {
                 counter--;
                 break;
             } 
-            else if (key == "hgt" ) counter -= (int)!isKeyValueValid(key, passport.at(key));
+            bool keyIsValid = isKeyValueValid(key, passport.at(key));
+            if (!keyIsValid) {
+                counter -= !keyIsValid;
+                break;
+            }
+
         }
     }
 
