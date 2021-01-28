@@ -60,7 +60,6 @@ bool isKeyValueValid(std::string key, std::string value){
         heightString.erase(heightString.length() - 2, 2);
         const std::regex endsWithCm("^[0-9]{3}cm$");
         const std::regex endsWithIn("^[0-9]{2}in$");
-        // std::cout << heightString << " " << value << std::endl;
         try {
             if (std::regex_match(value, endsWithCm)) {
                 int height = std::stoi(heightString);
@@ -85,8 +84,7 @@ bool isKeyValueValid(std::string key, std::string value){
     return false;
 }
 
-int main() {
-    std::vector<std::unordered_map<std::string, std::string>> passports = readPuzzleInputFromFile("../inputs/day4.txt");
+int solve(std::vector<std::unordered_map<std::string, std::string>> passports, int part) {
     std::vector<std::string> keys = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"};
     int counter = passports.size();
     for (const auto& passport : passports) {
@@ -94,15 +92,22 @@ int main() {
             if (passport.find(key) == passport.end()) {
                 counter--;
                 break;
-            } 
-            bool keyIsValid = isKeyValueValid(key, passport.at(key));
-            if (!keyIsValid) {
-                counter -= !keyIsValid;
-                break;
             }
-
+            if (part == 2) {
+                bool keyIsValid = isKeyValueValid(key, passport.at(key));
+                if (!keyIsValid) {
+                    counter -= !keyIsValid;
+                    break;
+                }
+            }
         }
     }
+    return counter;
+}
 
-    std::cout << "Solution part 1: " << counter << std::endl;
+int main() {
+    std::vector<std::unordered_map<std::string, std::string>> passports = readPuzzleInputFromFile("../inputs/day4.txt");
+    
+    std::cout << "Solution part 1: " << solve(passports, 1) << std::endl;
+    std::cout << "Solution part 2: " << solve(passports, 2) << std::endl;
 }
