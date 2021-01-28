@@ -58,13 +58,13 @@ bool isKeyValueValid(std::string key, std::string value){
     } else if (key == "hgt") {
         std::string heightString = value;
         heightString.erase(heightString.length() - 2, 2);
-        const std::regex endsWithCm("^[0-9]{3}cm$");
-        const std::regex endsWithIn("^[0-9]{2}in$");
+        const std::regex heightInCm("^[0-9]{3}cm$");
+        const std::regex heightInIn("^[0-9]{2}in$");
         try {
-            if (std::regex_match(value, endsWithCm)) {
+            if (std::regex_match(value, heightInCm)) {
                 int height = std::stoi(heightString);
                 if (height >= 150 && height <= 193) return true;
-            } else if (std::regex_match(value, endsWithIn)){
+            } else if (std::regex_match(value, heightInIn)){
                 int height = std::stoi(heightString);
                 if (height >= 59 && height <= 76) return true;
             }
@@ -107,7 +107,6 @@ int solve(std::vector<std::unordered_map<std::string, std::string>> passports, i
 
 int main() {
     std::vector<std::unordered_map<std::string, std::string>> passports = readPuzzleInputFromFile("../inputs/day4.txt");
-    
     std::cout << "Solution part 1: " << solve(passports, 1) << std::endl;
     std::cout << "Solution part 2: " << solve(passports, 2) << std::endl;
 }
