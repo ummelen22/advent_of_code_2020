@@ -5,7 +5,7 @@
 std::vector<std::string> readPuzzleInputFromFile(std::string fileName) {
     std::ifstream inFile(fileName);
     std::string line;
-    std::vector<std::string> linesInFile{};
+    std::vector<std::string> linesInFile;
 
     while (getline(inFile, line)) {
         linesInFile.push_back(line);
@@ -13,11 +13,16 @@ std::vector<std::string> readPuzzleInputFromFile(std::string fileName) {
     return linesInFile;
 }
 
-int numberOfTreesOnSlope(const std::vector<std::string>& area, std::vector<int> slope){
+struct Slope {
+    int dx;
+    int dy;
+};
+
+int numberOfTreesOnSlope(const std::vector<std::string>& area, const Slope slope){
     int index = 0;
     int counter = 0;
-    int stepRight = slope[0];
-    int stepDown = slope[1];
+    int stepRight = slope.dx;
+    int stepDown = slope.dy;
     for (std::vector<std::string>::const_iterator it = area.begin(); it != area.end() + stepDown - 1; it += stepDown) {
             if ((*it)[index % (*it).length()] == '#') {
                 counter++;
@@ -27,28 +32,19 @@ int numberOfTreesOnSlope(const std::vector<std::string>& area, std::vector<int> 
     return counter;
 }
 
-int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std::vector<std::vector<int>>& slopes) {
-    
-    std::vector<int> numberOfTreesPerSlope{};
-
-    for (std::vector<std::vector<int>>::const_iterator it = slopes.begin(); it != slopes.end(); it++) {
-        int numberOfTrees = numberOfTreesOnSlope(inputLines, *it);
-        numberOfTreesPerSlope.push_back(numberOfTrees);
-    } 
-
+int productOfTreesOnSlopes(const std::vector<std::string>& inputLines, const std::vector<Slope>& slopes) {
     int product = 1;
-    for (auto& numberOfTrees : numberOfTreesPerSlope){
-        product *= numberOfTrees;
-    }
-
+    for (const auto& slope : slopes) {
+        product *= numberOfTreesOnSlope(inputLines, slope);
+    } 
     return product;
 }
 
 int main() {
     const std::vector<std::string> inputLines = readPuzzleInputFromFile("../inputs/day3.txt");
 
-    const std::vector< std::vector<int> > slopesPart1 = {{3, 1}}; // slopes for part 1 {step right, step down}
-    const std::vector< std::vector<int> > slopesPart2 = { // slopes for part 2 {step right, step down}
+    const std::vector<Slope> slopesPart1 = {{3, 1}}; // slopes for part 1 {step right, step down}
+    const std::vector<Slope> slopesPart2 = { // slopes for part 2 {step right, step down}
         {1, 1},
         {3, 1},
         {5, 1},
