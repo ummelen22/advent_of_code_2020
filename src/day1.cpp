@@ -2,33 +2,43 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include <map>
+#include <time.h>
 
-using namespace std;
+std::vector<int> readPuzzleInputFromFile(const std::string &fileName) {
+    std::ifstream inFile(fileName);
+    std::string line;
+    std::vector<int> numbersInFile;
 
-vector<int> readPuzzleInputFromFile(string &fileName) {
-    ifstream inFile;
-    string line;
-    vector<int> numbersInFile;
-
-    inFile.open(fileName);
     while (getline(inFile, line)) {
-        numbersInFile.push_back(stoi(line));
+        try {
+            numbersInFile.push_back(stoi(line));
+        } 
+        catch (const std::invalid_argument& ia) {
+            std::cerr << "Invalid argument: " << line << " couldn't be converted to an int." << std::endl;
+        }
+        catch (const std::out_of_range& oor) {
+            std::cerr << "Invalid argument: " << line << " is out of range of representable values of int." << std::endl;
+        }
     }
-    inFile.close();
-
     return numbersInFile;
 }
 
-int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberOfKeys) {
+int getProductOfKeysThatSumUpToX(std::map<int, int> &inputMap, const int sum, int numberOfKeys, std::unordered_set<int> visitedKeys = {}) {
+    // Guard clause checking whether input for numberOfKeys is valid
+    if (numberOfKeys < 2) {
+        std::cout << "Only number of keys of 2 or higher are allowed, you entered " << numberOfKeys << std::endl;
+        exit(EXIT_FAILURE); 
+    }
+
+    // Recursive call to find keys that sum up to sum
     for (auto const &it : inputMap) {
         int diff = sum - it.first;
         if (numberOfKeys > 2) {
-            // Create temporary map to prevent the same key to be found in the recursive function call
-            map<int, int> tmpInputMap = inputMap;
-            tmpInputMap.erase(it.first);
+            visitedKeys.insert(it.first);
             int tmpNumberOfKeys = numberOfKeys - 1;
-            if (int product = getProductOfKeysThatSumUpToX(tmpInputMap, diff, tmpNumberOfKeys)) {
+            if (int product = getProductOfKeysThatSumUpToX(inputMap, diff, tmpNumberOfKeys, visitedKeys)) {
                 return it.first * product;
             }
             else {
@@ -36,7 +46,8 @@ int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberO
             }
         }
         auto search = inputMap.find(diff);
-        if (search != inputMap.end() and search->second != it.second) {
+        bool unusedKey = visitedKeys.find(diff) == visitedKeys.end();
+        if (search != inputMap.end() and unusedKey and search->second != it.second) {
             return it.first * search->first;
         }
     }
@@ -46,11 +57,11 @@ int getProductOfKeysThatSumUpToX(map<int, int> &inputMap, int &sum, int &numberO
 
 int main() {
     // Read puzzle input from txt file
-    string fileName = "../inputs/day1.txt";
-    vector<int> inputArray = readPuzzleInputFromFile(fileName);
+    std::string fileName = "../inputs/day1.txt";
+    std::vector<int> inputArray = readPuzzleInputFromFile(fileName);
 
     // Create std::map, mapping the puzzle input integers to their indices (O(log n) time complexity for search)
-    map<int, int> inputMap;
+    std::map<int, int> inputMap;
     for (int i = 0; i < inputArray.size(); i++) {
         inputMap[inputArray[i]] = i;
     }
@@ -58,12 +69,15 @@ int main() {
     // Get user input
     int sum;
     int numberOfKeys;
-    cout << "Sum you are looking for: ";
-    cin >> sum;
-    cout << "Amount of numbers that should add up to " << sum << ": ";
-    cin >> numberOfKeys;
-
+    std::cout << "Sum you are looking for: ";
+    std::cin >> sum;
+    std::cout << "Amount of numbers that should add up to " << sum << " (>=2):";
+    std::cin >> numberOfKeys;
+    clock_t t;
+    t = clock();
     // Find product of keys recursively
     int product = getProductOfKeysThatSumUpToX(inputMap, sum, numberOfKeys);
-    cout << "Solution: " << product << endl;
+    t = clock() - t;
+    std::cout << "Solution: " << product << std::endl;
+    std::cout << "It took " << ((float)t)/CLOCKS_PER_SEC << " seconds\n";
 }
