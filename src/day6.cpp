@@ -7,22 +7,20 @@
 #include <algorithm>
 
 
-std::unordered_map<int, std::vector<std::string>> readPuzzleInputFromFile(std::string fileName) {
+std::vector<std::vector<std::string>> readPuzzleInputFromFile(std::string fileName) {
     std::ifstream inFile(fileName);
     std::string line;
-    std::unordered_map<int, std::vector<std::string>> answers;
-    int group = 1;
+    std::vector<std::string> answersPerGroup;
+    std::vector<std::vector<std::string>> answers;
     while(getline(inFile, line)) {
         if(line.empty()) {
-            group++;
+            answers.push_back(answersPerGroup);
+            answersPerGroup.clear();
             continue;
         }
-        if (answers.find(group) != answers.end()) {
-            answers[group].push_back(line);
-        } else {
-            answers.insert(std::pair<int, std::vector<std::string>>(group, { line }));
-        }
+        answersPerGroup.push_back(line);
     }
+    if (!answersPerGroup.empty()) answers.push_back(answersPerGroup);
     return answers;
 }
 
@@ -84,10 +82,10 @@ int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
 // }
 
 int main() {
-    std::unordered_map<int, std::vector<std::string>> answersPerGroup = readPuzzleInputFromFile("../inputs/day6.txt");
+    std::vector<std::vector<std::string>> answers = readPuzzleInputFromFile("../inputs/day6.txt");
     int sum = 0;
-    for (auto& group : answersPerGroup) {
-        sum += numberOfDifferentAnswers(group.second);
+    for (auto& answersPerGroup : answers) {
+        sum += numberOfDifferentAnswers(answersPerGroup);
     }
     std::cout << "Solution part 1: " << sum << std::endl;
 }
