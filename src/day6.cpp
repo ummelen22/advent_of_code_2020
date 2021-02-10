@@ -20,10 +20,10 @@ std::vector<std::vector<std::string>> readPuzzleInputFromFile(std::string fileNa
 }
 
 template <typename T>
-struct skip {
+struct Skip {
     T& t;
     std::size_t n;
-    skip(T& vec, std::size_t indexToSkip) : t(vec), n(indexToSkip) {}
+    Skip(T& vec, std::size_t startIndex) : t(vec), n(startIndex) {}
     auto begin() -> decltype(std::begin(t)) {
         return std::next(std::begin(t), n);
     }
@@ -36,7 +36,7 @@ int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
 
     std::string uniqueAnswers = answers[0];
-    for (auto& answersPerPerson : skip<decltype(answers)>(answers, 1)) {
+    for (auto& answersPerPerson : Skip<decltype(answers)>(answers, 1)) {
         for (const char& answer : answersPerPerson) {
             if (uniqueAnswers.find(answer) == std::string::npos) {
                 uniqueAnswers += answer;
