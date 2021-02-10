@@ -6,40 +6,88 @@
 #include <regex>
 #include <algorithm>
 
-std::vector<std::string> splitString(std::string line, std::string delimiter){
-    size_t pos = line.find(delimiter);
-    size_t initPos = 0;
-    std::vector<std::string> subStrings = {};
-    while (pos != std::string::npos) {
-        subStrings.push_back(line.substr(initPos, pos - initPos));
-        initPos = pos + 1;
-        pos = line.find(delimiter, initPos);
-    }
-    subStrings.push_back(line.substr(initPos, std::min(pos, line.size()) - initPos + 1));
 
-    return subStrings;
+std::unordered_map<int, std::vector<std::string>> readPuzzleInputFromFile(std::string fileName) {
+    std::ifstream inFile(fileName);
+    std::string line;
+    std::unordered_map<int, std::vector<std::string>> answers;
+    int group = 1;
+    while(getline(inFile, line)) {
+        if(line.empty()) {
+            group++;
+            continue;
+        }
+        if (answers.find(group) != answers.end()) {
+            answers[group].push_back(line);
+        } else {
+            answers.insert(std::pair<int, std::vector<std::string>>(group, { line }));
+        }
+    }
+    return answers;
 }
 
-// std::vector<std::unordered_map<std::string, std::string>> readPuzzleInputFromFile(std::string fileName) {
-//     std::ifstream inFile(fileName);
-//     std::string line;
-//     std::vector<std::unordered_map<std::string, std::string>> passports{};
+template <typename T>
+struct skip {
+    T& t;
+    std::size_t n;
+    skip(T& vec, std::size_t indexToSkip) : t(vec), n(indexToSkip) {}
+    auto begin() -> decltype(std::begin(t)) {
+        return std::next(std::begin(t), n);
+    }
+    auto end() -> decltype(std::end(t)) {
+        return std::end(t);
+    }
+};
 
-//     std::unordered_map<std::string, std::string> passport{};
+int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
+    if ( answers.size() == 1 ) return answers[0].size();
 
-//     while (getline(inFile, line)) {
-//         if (line.empty()) {
-//             passports.push_back(passport);
-//             passport.clear();
-//             continue;
-//         }
-//         std::vector<std::string> passportData = splitString(line, " ");
-//         for (const auto& data : passportData) {
-//             std::vector<std::string> keyValuePair = splitString(data, ":");
-//             passport.insert(std::pair<std::string, std::string>(keyValuePair[0], keyValuePair[1]));
+    std::string uniqueAnswers = answers[0];
+    for (auto& answersPerPerson : skip<decltype(answers)>(answers, 1)) {
+        for (const char& answer : answersPerPerson) {
+            if (uniqueAnswers.find(answer) == std::string::npos) {
+                uniqueAnswers += answer;
+            }
+        }
+    }
+    return uniqueAnswers.size();
+}
+
+// int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
+
+//     if ( answers.size() == 1 ) return answers.size();
+
+//     std::vector<char> uniqueAnswers(answers[0].size());
+//     std::cout << "-----" << std::endl;
+//     std::cout << answers[0] << std::endl;
+//     for (std::size_t i = 0; i < answers[0].size(); ++i) {
+//         std::cout << uniqueAnswers[i] << std::endl;
+//         uniqueAnswers[i] = answers[0][i];
+//         std::cout << uniqueAnswers[i] << std::endl;
+//     }
+//     for (char& it : uniqueAnswers) {
+//         std::cout << it << std::endl;
+//     }
+//     std::cout << "hi" << std::endl;
+//     for (char& uniqueAnswer : uniqueAnswers) {
+//         for (const std::string& answer : answers) {
+//             if (answer.find(uniqueAnswer) == std::string::npos) {
+//                 std::cout << uniqueAnswer << " " << answer << std::endl;
+//                 uniqueAnswers.erase(std::find(uniqueAnswers.begin(), uniqueAnswers.end(), uniqueAnswer));
+//             }
 //         }
 //     }
-//     passports.push_back(passport);
-
-//     return passports;
+//     std::cout << "3" << std::endl;
+    
+//     std::cout << "\n\n" << std::endl;
+//     return uniqueAnswers.size();
 // }
+
+int main() {
+    std::unordered_map<int, std::vector<std::string>> answersPerGroup = readPuzzleInputFromFile("../inputs/day6.txt");
+    int sum = 0;
+    for (auto& group : answersPerGroup) {
+        sum += numberOfDifferentAnswers(group.second);
+    }
+    std::cout << "Solution part 1: " << sum << std::endl;
+}
