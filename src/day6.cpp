@@ -1,11 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <map>
-#include <unordered_map>
 #include <fstream>
-#include <regex>
-#include <algorithm>
-
 
 std::vector<std::vector<std::string>> readPuzzleInputFromFile(std::string fileName) {
     std::ifstream inFile(fileName);
