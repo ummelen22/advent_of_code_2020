@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
-std::vector<std::vector<std::string>> readPuzzleInputFromFile(std::string fileName) {
+
+std::vector<std::vector<std::string>> readPuzzleInputFromFile(const std::string& fileName) {
     std::ifstream inFile(fileName);
     std::string line;
     std::vector<std::string> answersPerGroup;
@@ -32,7 +34,7 @@ struct Skip {
     }
 };
 
-int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
+int numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
 
     std::string uniqueAnswers = answers[0];
@@ -46,41 +48,32 @@ int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
     return uniqueAnswers.size();
 }
 
-// int numberOfDifferentAnswers(const std::vector<std::string>& answers) {
-
-//     if ( answers.size() == 1 ) return answers.size();
-
-//     std::vector<char> uniqueAnswers(answers[0].size());
-//     std::cout << "-----" << std::endl;
-//     std::cout << answers[0] << std::endl;
-//     for (std::size_t i = 0; i < answers[0].size(); ++i) {
-//         std::cout << uniqueAnswers[i] << std::endl;
-//         uniqueAnswers[i] = answers[0][i];
-//         std::cout << uniqueAnswers[i] << std::endl;
-//     }
-//     for (char& it : uniqueAnswers) {
-//         std::cout << it << std::endl;
-//     }
-//     std::cout << "hi" << std::endl;
-//     for (char& uniqueAnswer : uniqueAnswers) {
-//         for (const std::string& answer : answers) {
-//             if (answer.find(uniqueAnswer) == std::string::npos) {
-//                 std::cout << uniqueAnswer << " " << answer << std::endl;
-//                 uniqueAnswers.erase(std::find(uniqueAnswers.begin(), uniqueAnswers.end(), uniqueAnswer));
-//             }
-//         }
-//     }
-//     std::cout << "3" << std::endl;
+int numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>& answers) {
+    if ( answers.size() == 1 ) return answers[0].size();
     
-//     std::cout << "\n\n" << std::endl;
-//     return uniqueAnswers.size();
-// }
+    std::vector<char> allAnswered(answers[0].begin(), answers[0].end());
+    for (std::vector<char>::const_iterator it = allAnswered.begin(); it < allAnswered.end(); it++) {
+        for (const std::string& answersPerPerson : answers)
+        {
+            if (answersPerPerson.find(*it) == std::string::npos)
+            {
+                allAnswered.erase(it);
+                it--;
+                if (allAnswered.empty()) return 0;   
+                break;
+            }
+        }
+    }
+    return allAnswered.size();
+}
 
 int main() {
     std::vector<std::vector<std::string>> answers = readPuzzleInputFromFile("../inputs/day6.txt");
-    int sum = 0;
+    int sumAny, sumAll = 0;
     for (auto& answersPerGroup : answers) {
-        sum += numberOfDifferentAnswers(answersPerGroup);
+        sumAny += numberOfAnswers_AnsweredByAnyGroupMember(answersPerGroup);
+        sumAll += numberOfAnswers_AnsweredByAllGroupMembers(answersPerGroup);
     }
-    std::cout << "Solution part 1: " << sum << std::endl;
+    std::cout << "Solution part 1: " << sumAny << std::endl;
+    std::cout << "Solution part 2: " << sumAll << std::endl;
 }
