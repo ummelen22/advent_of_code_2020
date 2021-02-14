@@ -21,25 +21,12 @@ std::vector<std::vector<std::string>> readPuzzleInputFromFile(const std::string&
     return answers;
 }
 
-template <typename T>
-struct Skip {
-    T& t;
-    std::size_t n;
-    Skip(T& vec, std::size_t startIndex) : t(vec), n(startIndex) {}
-    auto begin() -> decltype(std::begin(t)) {
-        return std::next(std::begin(t), n);
-    }
-    auto end() -> decltype(std::end(t)) {
-        return std::end(t);
-    }
-};
-
 int numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
-
+    
     std::string uniqueAnswers = answers[0];
-    for (auto& answersPerPerson : Skip<decltype(answers)>(answers, 1)) {
-        for (const char& answer : answersPerPerson) {
+    for (size_t i = 1; i < answers.size(); i++) {
+        for (const char& answer : answers[i]) {
             if (uniqueAnswers.find(answer) == std::string::npos) {
                 uniqueAnswers += answer;
             }
