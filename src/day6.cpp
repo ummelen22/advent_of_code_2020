@@ -21,7 +21,7 @@ std::vector<std::vector<std::string>> readPuzzleInputFromFile(const std::string&
     return answers;
 }
 
-int numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& answers) {
+size_t numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
     
     std::string uniqueAnswers = answers[0];
@@ -35,7 +35,7 @@ int numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& ans
     return uniqueAnswers.size();
 }
 
-int numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>& answers) {
+size_t numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
     
     std::vector<char> allAnswered(answers[0].begin(), answers[0].end());
@@ -56,7 +56,8 @@ int numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>& an
 
 int main() {
     std::vector<std::vector<std::string>> answers = readPuzzleInputFromFile("../inputs/day6.txt");
-    int sumAny, sumAll = 0;
+    size_t sumAny = 0;
+    size_t sumAll = 0;
     for (auto& answersPerGroup : answers) {
         sumAny += numberOfAnswers_AnsweredByAnyGroupMember(answersPerGroup);
         sumAll += numberOfAnswers_AnsweredByAllGroupMembers(answersPerGroup);
