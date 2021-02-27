@@ -3,21 +3,21 @@
 #include <fstream>
 #include <algorithm>
 
+typedef std::vector<std::string> GroupAnswers;
 
-std::vector<std::vector<std::string>> readPuzzleInputFromFile(const std::string& fileName) {
+std::vector<GroupAnswers> readPuzzleInputFromFile(const std::string& fileName) {
     std::ifstream inFile(fileName);
     std::string line;
-    std::vector<std::string> answersPerGroup;
-    std::vector<std::vector<std::string>> answers;
+    GroupAnswers answersPerGroup;
+    std::vector<GroupAnswers> answers;
     while(getline(inFile, line)) {
         if(line.empty()) {
-            answers.push_back(answersPerGroup);
-            answersPerGroup.clear();
+            answers.push_back(std::move(answersPerGroup));
             continue;
         }
-        answersPerGroup.push_back(line);
+        answersPerGroup.push_back(std::move(line));
     }
-    if (!answersPerGroup.empty()) answers.push_back(answersPerGroup);
+    if (!answersPerGroup.empty()) answers.push_back(std::move(answersPerGroup));
     return answers;
 }
 
@@ -35,7 +35,7 @@ size_t numberOfAnswers_AnsweredByAnyGroupMember(const std::vector<std::string>& 
     return uniqueAnswers.size();
 }
 
-size_t numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>& answers) {
+size_t numberOfAnswers_AnsweredByAllGroupMembers(const GroupAnswers& answers) {
     if ( answers.size() == 1 ) return answers[0].size();
     
     std::vector<char> allAnswered(answers[0].begin(), answers[0].end());
@@ -55,7 +55,7 @@ size_t numberOfAnswers_AnsweredByAllGroupMembers(const std::vector<std::string>&
 }
 
 int main() {
-    std::vector<std::vector<std::string>> answers = readPuzzleInputFromFile("../inputs/day6.txt");
+    auto answers = readPuzzleInputFromFile("../inputs/day6.txt");
     size_t sumAny = 0;
     size_t sumAll = 0;
     for (auto& answersPerGroup : answers) {
